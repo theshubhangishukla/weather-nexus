@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Weather - Predictive Climate Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,700&display=swap" rel="stylesheet">
+
+    <div class="brand-header">
+    <div class="nexus-logo">
+        <div class="logo-core"></div>
+        <div class="logo-pulse"></div>
+    </div>
+    <h1>Nexus Climate Interface <span class="version">v2.0.25</span></h1>
+</div>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="search-bar">
+                <div class="geo-locate">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                    </svg>
+                </div>
+                <input type="text" placeholder="Search city or coordinates..." class="city-search">
+                <button class="ai-predict">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="weather-grid">
+                <div class="main-card">
+                    <div class="current-temp">
+                        <span class="temp">24</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="condition">Partly Cloudy</div>
+                    <div class="location">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        <span>New York City</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-item">
+                        <div class="detail-icon humidity"></div>
+                        <div class="detail-info">
+                            <div class="value">78%</div>
+                            <div class="label">Humidity</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon wind"></div>
+                        <div class="detail-info">
+                            <div class="value">12 km/h</div>
+                            <div class="label">Wind Speed</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon pressure"></div>
+                        <div class="detail-info">
+                            <div class="value">1014 hPa</div>
+                            <div class="label">Pressure</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon uv"></div>
+                        <div class="detail-info">
+                            <div class="value">3</div>
+                            <div class="label">UV Index</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="forecast-card">
+                    <div class="hourly-forecast">
+                        <div class="hour-item">
+                            <div class="time">Now</div>
+                            <div class="hour-temp">24°</div>
+                        </div>
+                        <!-- More hour items -->
+                    </div>
+                    
+            
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'ef8203e3a2a375158f2310eb46362e6d';
+        
+        const elements = {
+            searchInput: document.querySelector('.city-search'),
+            tempValue: document.querySelector('.temp'),
+            condition: document.querySelector('.condition'),
+            location: document.querySelector('.location span'),
+            humidity: document.querySelector('.humidity .value'),
+            wind: document.querySelector('.wind .value'),
+            pressure: document.querySelector('.pressure .value'),
+            uv: document.querySelector('.uv .value')
+        };
+
+        async function fetchWeather(city) {
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+                );
+                const data = await response.json();
+                
+                // Update UI
+                elements.tempValue.textContent = Math.round(data.main.temp);
+                elements.condition.textContent = data.weather[0].main;
+                elements.location.textContent = data.name;
+                elements.humidity.textContent = `${data.main.humidity}%`;
+                elements.wind.textContent = `${data.wind.speed} km/h`;
+                elements.pressure.textContent = `${data.main.pressure} hPa`;
+                
+                // Update dynamic background
+                document.body.style.background = `radial-gradient(circle at 100% 0%, 
+                    ${getConditionColor(data.weather[0].main)}, #0a0a0a)`;
+
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+            }
+        }
+
+        function getConditionColor(condition) {
+            const colors = {
+                Clear: '#FFD700',
+                Clouds: '#7EC8E3',
+                Rain: '#00B4D8',
+                Thunderstorm: '#560BAD',
+                Snow: '#B9FBC0',
+                Mist: '#C0E3E7'
+            };
+            return colors[condition] || '#7EC8E3';
+        }
+
+        // Event Listeners
+        document.querySelector('.ai-predict').addEventListener('click', () => {
+            if(elements.searchInput.value) fetchWeather(elements.searchInput.value);
+        });
+
+        elements.searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') fetchWeather(elements.searchInput.value);
+        });
+
+        
+
+        // Initial load
+        fetchWeather('New York');
+    </script>
+    <audio id="hover-sound" src="static/activation.ogg"></audio>
+</body>
+</html>

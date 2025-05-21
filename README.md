@@ -3,7 +3,7 @@
 ## Description
 A simple web application that allows users to get current weather conditions for any city worldwide. This project demonstrates fetching data from a third-party API and displaying it in a user-friendly interface.
 
-nexus weather 1.png
+
 
 ## Features
 * Search for weather by city name.
